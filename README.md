@@ -9,7 +9,7 @@ Install Python 3.11 or later. Use a local NTFS folder for the workbook copies, a
 Clone the review branch and run these commands in PowerShell from the repository root.
 
 ```powershell
-git clone --branch codex/mvp-p2-1 https://github.com/smartkids-adventure/construction-ai-agent.git
+git clone --branch codex/mvp-p3 https://github.com/smartkids-adventure/construction-ai-agent.git
 cd construction-ai-agent
 py -3 -m venv .venv
 $python = ".\.venv\Scripts\python.exe"
@@ -129,3 +129,47 @@ recalculate the committed fixture in memory and compare its results. Because
 openpyxl does not evaluate formulas, desktop Excel recalculation is required
 to populate displayed totals. Approval and audit use local synthetic labels,
 and the commit workflow supports local synthetic workbooks only.
+
+## P3 dashboard and reports
+
+Install the branch requirements and run the local baseline command described
+above. The dashboard uses the reporting snapshot recorded as committed in the
+same SQLite journal. Choose the saved revision at its recorded path. It is
+loaded read-only, and the file fingerprint must match the commit record.
+
+```powershell
+& $python -m kvd.report_demo .\local\p3-demo
+& $python -m kvd.report_desktop --journal .\local\p3-demo\audit.sqlite3 --workbook .\local\p3-demo\synthetic-reporting-snapshot.xlsx
+& $python -m unittest discover -s tests -v
+```
+
+Use a fresh demo directory. Select **Load snapshot**. The dashboard filters by
+inclusive date range, Workfront ID, activity, subcontractor, and status. Date
+filters use the record date. A row without the requested date or attribution
+is excluded when that filter is active. Blank attribution in the workbook is
+kept blank. The activity dropdown includes activity IDs from quantity records
+and recorded activity text from relevant status registers.
+
+The dashboard shows period quantities from dated site records. It groups them
+by workfront, activity, subcontractor, and unit. A partial total shows the
+number of rows with recorded values. Missing quantities remain distinct from
+zero. Technical and QA/QC views cover open items. Utility status is reported
+from the register, and readiness follows the existing readiness rule.
+
+For a report, choose MC10 for the anchor day or MC02 for its Monday-to-Sunday
+week. Reports use the selected workbook and period independently of dashboard
+filters. Open issues, actions, tasks, utility, and readiness show the state
+recorded in that snapshot, with future-dated entries excluded. The report
+does not reconstruct past status transitions from a later workbook.
+
+Create a draft, review it, and approve it under a different named reviewer.
+Issue Word and PDF together. Once issued, both files and their checksums are
+stored in SQLite. A new draft for the same command and period receives the
+next revision number. Export copies the stored pair to a revision folder.
+The renderers are local, and no Office installation is required to generate
+the files.
+
+This branch uses synthetic data and local audit names. Production roles,
+live data, multilingual reports, and Windows desktop acceptance remain
+outside this verified run. The Windows Excel commit acceptance from P2.1
+still applies when evaluating the source workflow.
