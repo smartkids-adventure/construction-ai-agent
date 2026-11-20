@@ -45,10 +45,9 @@ class SiteIntake(unittest.TestCase):
         self.assertNotIn((20, "I5"), cells)
         self.assertEqual(cells[(16, "B6")], cells[(15, "A5")])
         self.assertEqual(cells[(16, "J6")], "Pending")
-        self.assertEqual(cells[(19, "F5")], "Blocked")
-        self.assertEqual(cells[(19, "F6")], "Pending")
-        self.assertEqual(cells[(19, "L5")], "Not released")
-        self.assertEqual(cells[(19, "L6")], "Not released")
+        self.assertEqual(cells[(19, "K5")], self.drafts[3].fields["blocker"])
+        for index, address in ((19, "F5"), (19, "L5"), (19, "L6"), (17, "L5")):
+            self.assertNotIn((index, address), cells)
         self.assertNotIn((19, "O5"), cells)
         self.assertNotIn((19, "M5"), cells)
         self.assertNotIn((17, "M5"), cells)

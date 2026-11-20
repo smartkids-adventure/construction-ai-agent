@@ -9,7 +9,7 @@ Install Python 3.11 or later. Use a local NTFS folder for the workbook copies, a
 Clone the review branch and run these commands in PowerShell from the repository root.
 
 ```powershell
-git clone --branch codex/mvp-p2 https://github.com/smartkids-adventure/construction-ai-agent.git
+git clone --branch codex/mvp-p2-1 https://github.com/smartkids-adventure/construction-ai-agent.git
 cd construction-ai-agent
 py -3 -m venv .venv
 $python = ".\.venv\Scripts\python.exe"
@@ -60,7 +60,7 @@ The migration operates on generated synthetic fixtures through openpyxl. The act
 
 ## P2 desktop review
 
-Use the `codex/mvp-p2` branch for desktop intake. Complete the local
+Use the `codex/mvp-p2-1` branch for desktop intake and staged Excel commits. Complete the local
 baseline setup above once from the repository root. Then use a fresh
 demo directory inside `local`:
 
@@ -84,13 +84,48 @@ are local audit labels for synthetic acceptance.
 
 Approval records the preview digest, workbook fingerprint, source excerpts,
 edited data, duplicate decisions, optional quantity verification evidence,
-and exact typed cell proposals in SQLite. No P2 code applies those proposals.
-Clearance evidence fields and release authority fields stay outside the
-write proposal. Toolbox attendance stays pending verification and readiness
-stays pending or blocked. The original and synthetic source workbooks remain
-read-only during P2 review.
+and exact typed cell proposals in SQLite. Clearance and release fields stay
+outside the write scope. Reported blockers can be recorded as observations.
+The original and synthetic source workbooks remain read-only.
 
 Free-form WhatsApp prose, attachments, authenticated reviewer roles,
-and application of approved proposals to a workbook are outside this P2
-workflow. No live data should be entered. Run the full acceptance suite with
+and production workbook editing are outside this P2.1 workflow. No live data should be entered. Run the full acceptance suite with
 `python -m unittest discover -s tests -v`.
+
+### Commit and recover a synthetic workbook revision
+
+1. Paste English or Bahasa Melayu labels. For example, use `Workfront` or
+   `Zon kerja`, `Date` or `Tarikh`, and `Reported qty` or
+   `Kuantiti dilaporkan`. You can mix labels in the same paste. See
+   `examples/synthetic-report-ms.txt`. Values are preserved as entered and
+   missing required fields must be supplied during review.
+2. Review the proposal and record approval. Choose **Save approved revision**
+   and enter a new `.xlsx` path on a local NTFS volume. The application
+   verifies the reviewed source, records the staged revision and its
+   before-and-after values in SQLite, and publishes it to the new path.
+   Reopen the successor for the next batch. Generate a fresh preview for
+   any older proposal that targets a protected field or a superseded source.
+3. After an interruption, use **Recover** with the operator field filled in.
+   A matching output and backup complete the journal entry. A missing
+   output with a verified backup allows a retry. A mismatch stays pending
+   for manual comparison.
+
+Approved tokens can also be used after restarting the desktop. The status
+shows the leading characters of the token. The complete token is recorded
+in the SQLite preview and approval events.
+
+```powershell
+$token = Read-Host "Full approval token"
+& $python -m kvd.excel_commit --journal .\local\p2-demo\audit.sqlite3 commit $token .\local\p2-demo\revision-2.xlsx --actor "Synthetic Operator"
+& $python -m kvd.excel_commit --journal .\local\p2-demo\audit.sqlite3 recover --actor "Synthetic Operator"
+& $python -m unittest discover -s tests -v
+.\tests\excel-commit-acceptance.ps1 -Python $python -DemoDirectory .\local\windows-commit-test
+```
+
+Use a fresh Windows acceptance-test directory. The Python tests verify formula
+definitions and independently compute expected progress and BQ totals from
+verified quantities. The PowerShell acceptance test uses desktop Excel to
+recalculate the committed fixture in memory and compare its results. Because
+openpyxl does not evaluate formulas, desktop Excel recalculation is required
+to populate displayed totals. Approval and audit use local synthetic labels,
+and the commit workflow supports local synthetic workbooks only.

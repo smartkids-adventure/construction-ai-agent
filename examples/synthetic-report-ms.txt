@@ -1,0 +1,13 @@
+Zon kerja: Mock North
+Arahan: MC01
+Tarikh: 2026-01-15
+Syif: Day
+ID aktiviti: SYN-CUT
+Aktiviti: Kerja percubaan
+Item BQ: SYN-BQ-1
+Kru: Mock Crew A
+Unit: m3
+Kuantiti dilaporkan: 18
+Bukti: SYN-PHOTO-001
+Catatan: Laporan sintetik
+Sumber: Plant | Mock excavator | 1 | 3

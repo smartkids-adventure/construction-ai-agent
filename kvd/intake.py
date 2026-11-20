@@ -25,6 +25,18 @@ REQUIRED = {
     "MC12": ("utility id", "utility type"),
 }
 
+LABELS_MS = {
+    "had kerja": "workfront", "zon kerja": "workfront", "kawasan kerja": "workfront",
+    "lokasi kerja": "workfront", "arahan": "command", "perintah": "command",
+    "tarikh": "date", "syif": "shift", "aktiviti": "activity", "bukti": "evidence",
+    "id aktiviti": "activity id", "item bq": "bq item", "kru": "crew",
+    "kuantiti dilaporkan": "reported qty", "kuantiti lapor": "reported qty",
+    "catatan": "notes", "sumber": "resources", "id tugasan": "task id",
+    "hasil": "outcome", "ketua": "lead", "topik": "topics", "rujukan jsa": "jsa ref",
+    "kehadiran": "attendees", "id utiliti": "utility id", "jenis utiliti": "utility type",
+    "pemilik": "owner", "halangan": "blocker", "arahan pemindahan": "relocation instruction",
+}
+
 
 @dataclass
 class Draft:
@@ -46,10 +58,11 @@ def parse(text, default_command="MC01"):
         if not match:
             raise ValueError(f"Expected 'Field: value': {line[:70]}")
         key = " ".join(match[1].lower().replace("_", " ").replace("-", " ").split())
+        key = LABELS_MS.get(key, key)
         if key == "workfront":
             groups.append(({}, []))
         if not groups:
-            raise ValueError("Start each report with 'Workfront: alias'")
+            raise ValueError("Start each report with Workfront: alias or Zon kerja: alias")
         fields, lines = groups[-1]
         if key in fields:
             raise ValueError(f"Repeated field: {key}")

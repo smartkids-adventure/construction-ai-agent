@@ -175,7 +175,7 @@ def stage_rows(planner, draft, front, day, digest, verification, target):
             if cell.value != front["id"]:
                 raise ValueError("Task belongs to a different workfront")
             planner.write(TASK, task, {"J": fields["evidence"], "K": fields["outcome"]})
-        return
+        return prepared["A"] if target is None else planner.book.worksheets[SITE][f"A{target}"].value
     (workfront, location, day, shift, activity, evidence), reference = prepared
     if draft.command == "MC11":
         workers = [worker.strip() for worker in fields["attendees"].split(";")]
@@ -198,15 +198,12 @@ def stage_rows(planner, draft, front, day, digest, verification, target):
     else:
         planner.new(UTILITY, {"A": fields["utility id"], "B": workfront, "C": day,
                               "D": location, "E": fields["utility type"], "F": fields.get("owner"),
-                              "G": evidence, "H": "Conflict" if fields.get("blocker") else "Unknown",
-                              "L": "Blocked" if fields.get("blocker") else "Pending"})
+                              "G": evidence})
     if fields.get("relocation instruction"):
         planner.new(RELOCATION, {"A": reference, "B": fields["utility id"], "C": workfront,
-                                 "E": fields["relocation instruction"], "H": "Not started"})
+                                 "E": fields["relocation instruction"]})
     planner.new(READINESS, {"A": workfront, "B": day, "C": shift, "D": location, "E": activity,
-                           "F": "Blocked" if fields.get("blocker") else "Pending",
-                           "H": "Pending", "I": "Pending", "J": "Pending",
-                           "K": fields.get("blocker"), "L": "Not released", "P": evidence})
+                           "K": fields.get("blocker"), "P": evidence})
 
 
 def approved_state(db):
@@ -301,9 +298,9 @@ def build_preview(journal, planner, path, sha, drafts, decisions, actor):
                 raise ValueError("Only one draft per utility ID is supported in a review batch")
             used_utility.add(identifier)
         digest = checksum([source_hash, fields, match_key, len(results)])
-        stage_rows(planner, draft, front, day, digest, verification, target)
+        site_record_id = stage_rows(planner, draft, front, day, digest, verification, target)
         item.update({"match_key": match_key, "workfront": front["id"], "duplicates": candidates,
-                     "verification": verification, "target_record": decision.get("record_id") if target else None})
+                     "verification": verification, "site_record_id": site_record_id, "target_record": decision.get("record_id") if target else None})
         results.append(item)
         seen.add(tuple(match_key))
         seen_pastes.add(source_hash)

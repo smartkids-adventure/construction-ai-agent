@@ -7,6 +7,7 @@ from tkinter import filedialog, font, messagebox, ttk
 
 from openpyxl.utils.exceptions import InvalidFileException
 
+from .excel_commit import commit, recover
 from .intake import COMMANDS, FIELDS, parse
 from .journal import Journal
 from .proposals import approve, preview
@@ -66,7 +67,7 @@ class Desktop:
         top.pack(fill="x")
         tk.Label(top, text="Site intake & review", bg=NAVY, fg="white",
                  font=(self.ui_font, 24, "bold")).pack(anchor="w")
-        tk.Label(top, text="Synthetic workspace  |  Approval records Excel proposals only",
+        tk.Label(top, text="Synthetic workspace  |  Approved updates create a new workbook revision",
                  bg=NAVY, fg="#b7ccde", font=(self.ui_font, 11)).pack(anchor="w")
         main = ttk.Frame(self.root, padding=(20, 12))
         main.pack(fill="both", expand=True)
@@ -94,7 +95,7 @@ class Desktop:
         ttk.Label(bar, text="Default command").pack(side="left", padx=(0, 8))
         ttk.Combobox(bar, textvariable=self.command, values=list(COMMANDS), state="readonly",
                      width=9).pack(side="left")
-        ttk.Label(bar, text="Start each block with Workfront: alias. Use one Field: value per line.",
+        ttk.Label(bar, text="Start with Workfront: alias or Zon kerja: alias. Use one field per line.",
                   style="Muted.TLabel").pack(side="left", padx=12)
         ttk.Button(bar, text="Parse into drafts", style="Accent.TButton",
                    command=lambda: self.run(self.parse_paste)).pack(side="right")
@@ -184,6 +185,10 @@ class Desktop:
         self.approve_button = ttk.Button(foot, text="Approve proposal", style="Accent.TButton",
                                          command=self.confirm_approval, state="disabled")
         self.approve_button.pack(side="right")
+        self.commit_button = ttk.Button(foot, text="Save approved revision", state="disabled",
+                                        command=lambda: self.run(self.save_revision))
+        self.commit_button.pack(side="right", padx=8)
+        ttk.Button(foot, text="Recover", command=lambda: self.run(self.recover_revisions)).pack(side="right")
 
     def choose(self):
         path = filedialog.askopenfilename(filetypes=[("Excel workbook", "*.xlsx")])
@@ -197,6 +202,7 @@ class Desktop:
             self.summary.set("Draft changed. Rebuild the Excel preview before approval.")
             self.cells.delete(*self.cells.get_children())
             self.approve_button.configure(state="disabled")
+            self.commit_button.configure(state="disabled")
 
     def run(self, operation):
         try:
@@ -298,7 +304,27 @@ class Desktop:
     def approve_current(self):
         approve(self.journal, self.token, self.reviewer.get().strip(), self.attested.get())
         self.approve_button.configure(state="disabled")
-        self.status.set(f"Proposal {self.token[:12]} approved and recorded. Workbook was read only.")
+        if self.payload["changes"]:
+            self.commit_button.configure(state="normal")
+        self.status.set(f"Proposal {self.token[:12]} approved. Save it as a new workbook revision.")
+
+    def save_revision(self):
+        output = filedialog.asksaveasfilename(
+            parent=self.root, defaultextension=".xlsx", filetypes=[("Excel workbook", "*.xlsx")])
+        if output:
+            self.write_revision(output)
+
+    def write_revision(self, output):
+        result = commit(self.journal, self.token, output, self.operator.get().strip())
+        self.commit_button.configure(state="disabled")
+        self.status.set(f"Saved {Path(result['output']).name} | Workbook fingerprint {result['output_sha'][:12]}")
+
+    def recover_revisions(self):
+        result = recover(self.journal, self.operator.get().strip())
+        if not result:
+            self.status.set("No interrupted proposal commits found.")
+            return
+        self.status.set("  |  ".join(f"{token[:12]}: {state}" for token, state in result))
 
 
 def main():
