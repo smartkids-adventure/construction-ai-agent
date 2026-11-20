@@ -1,0 +1,6 @@
+[
+  {"operation":"material","id":"SYN-REBAR","description":"Reinforcement steel","specification":"Synthetic Grade 500, bar schedule DS-001","unit":"kg","lead":5,"safety":"20","variance":"10"},
+  {"operation":"material","id":"SYN-DUCT","description":"Utility duct","specification":"Synthetic 110 mm duct, class D","unit":"m","lead":3,"safety":"10","variance":"10"},
+  {"operation":"material","id":"SYN-GROUT","description":"Non-shrink grout","specification":"Synthetic grout, mock technical data sheet","unit":"kg","lead":4,"safety":"15","variance":"10"},
+  {"operation":"material","id":"SYN-PANEL","description":"Precast panel","specification":"Synthetic panel type P1","unit":"ea","lead":7,"safety":"2","variance":"10"}
+]

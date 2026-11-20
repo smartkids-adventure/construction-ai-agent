@@ -7,6 +7,7 @@ from tkinter import StringVar, Text, Tk, filedialog, font, messagebox, ttk
 from openpyxl.utils.exceptions import InvalidFileException
 
 from .journal import Journal
+from .material_desktop import MaterialDashboard
 from .report_data import FILTERS, SECTIONS, approved_snapshot, comparison, display_quantity, select
 from .report_render import HEADERS, TITLES, content
 from . import reports
@@ -71,6 +72,9 @@ class ReportingDesktop:
         self.tabs.add(self.reporting, text="Report review and issue")
         self.dashboard(dashboard)
         self.report_panel(self.reporting)
+        materials = ttk.Frame(self.tabs, padding=11)
+        self.tabs.add(materials, text="Material control")
+        self.material_dashboard = MaterialDashboard(materials, self.journal, self.call)
 
     def call(self, callback):
         try:

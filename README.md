@@ -9,7 +9,7 @@ Install Python 3.11 or later. Use a local NTFS folder for the workbook copies, a
 Clone the review branch and run these commands in PowerShell from the repository root.
 
 ```powershell
-git clone --branch codex/mvp-p3 https://github.com/smartkids-adventure/construction-ai-agent.git
+git clone --branch codex/mvp-p4 https://github.com/smartkids-adventure/construction-ai-agent.git
 cd construction-ai-agent
 py -3 -m venv .venv
 $python = ".\.venv\Scripts\python.exe"
@@ -173,3 +173,26 @@ This branch uses synthetic data and local audit names. Production roles,
 live data, multilingual reports, and Windows desktop acceptance remain
 outside this verified run. The Windows Excel commit acceptance from P2.1
 still applies when evaluating the source workflow.
+
+## P4 material planning and control
+
+Install the branch requirements and create the local workbook baseline using
+the instructions above. The original Excel structure stays read-only. Material
+records, approvals, and files use additive tables in the same SQLite journal
+as P1–P3.
+
+```powershell
+& $python -m kvd.material_demo .\local\p4-demo
+& $python -m kvd.report_desktop --journal .\local\p4-demo\audit.sqlite3 --workbook .\local\p4-demo\synthetic-material-snapshot.xlsx
+& $python -m unittest discover -s tests -v
+```
+
+Create the demo in a fresh directory. Select **Load snapshot** for the P3 view,
+then open **Material control**, enter `2026-01-15`, and refresh. Use the
+Workfront ID, material, and warning filters to narrow the 14-day forecast.
+The detail menu switches between the projection, deliveries, consumption
+variance, procurement queue, and requisition history.
+
+See [Material control instructions](docs/material-control.md) for input
+formats, forecast rules, requisition approvals and export, limitations, and
+the Windows acceptance checklist.
