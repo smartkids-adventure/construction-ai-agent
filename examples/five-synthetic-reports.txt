@@ -1,0 +1,58 @@
+Workfront: Mock North
+Command: MC01
+Date: 2026-01-15
+Shift: Day
+Activity ID: SYN-CUT
+Activity: Trial excavation
+BQ item: SYN-BQ-1
+Crew: Mock Crew A
+Unit: m3
+Reported qty: 18
+Evidence: SYN-PHOTO-001
+Notes: Synthetic trial run
+Resources: Plant | Mock excavator | 1 | 3
+
+Workfront: Mock East
+Command: MC14
+Date: 2026-01-15
+Shift: Day
+Activity ID: SYN-DRAIN
+Activity: Drain bedding
+Crew: Mock Crew B
+Unit: m
+Reported qty: 12.5
+Task ID: SYN-TASK-1
+Outcome: Bedding length reported for senior review
+Evidence: SYN-PHOTO-002
+
+Workfront: Mock West
+Command: MC11
+Date: 2026-01-15
+Shift: Day
+Activity: Mock toolbox briefing
+Lead: Mock Supervisor
+Topics: Walkway checks and reporting
+JSA ref: SYN-JSA-3
+Attendees: MOCK-W01; MOCK-W02
+Evidence: SYN-ATTEND-003
+
+Workfront: Mock South
+Command: MC12
+Date: 2026-01-15
+Shift: Day
+Activity: Mock drainage crossing
+Utility ID: SYN-UTIL-4
+Utility type: Electrical
+Owner: Mock Utility Owner
+Blocker: Reported conflict at mock crossing
+Relocation instruction: SYN-INSTRUCTION-4
+Evidence: SYN-UTILITY-004
+
+Workfront: Mock Central
+Command: MC12
+Date: 2026-01-15
+Shift: Night
+Activity: Mock access review
+Utility ID: SYN-UTIL-5
+Utility type: Unknown
+Evidence: SYN-UTILITY-005
